@@ -18,6 +18,11 @@
  * 
  */
 class AudioTrack {
+private:
+    void clear();
+    void copy_from(const AudioTrack& other);
+    void move_from(AudioTrack&& other);
+
 protected:
     std::string title;
     std::vector<std::string> artists;

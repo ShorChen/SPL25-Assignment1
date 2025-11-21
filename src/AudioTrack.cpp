@@ -35,7 +35,7 @@ AudioTrack::~AudioTrack() {
     #ifdef DEBUG
     std::cout << "AudioTrack destructor called for: " << title << std::endl;
     #endif
-    // Your code here...
+    clear();
 }
 
 AudioTrack::AudioTrack(const AudioTrack& other)
@@ -44,7 +44,7 @@ AudioTrack::AudioTrack(const AudioTrack& other)
     #ifdef DEBUG
     std::cout << "AudioTrack copy constructor called for: " << other.title << std::endl;
     #endif
-    // Your code here...
+    copy_from(other);
 }
 
 AudioTrack& AudioTrack::operator=(const AudioTrack& other) {
@@ -52,7 +52,10 @@ AudioTrack& AudioTrack::operator=(const AudioTrack& other) {
     #ifdef DEBUG
     std::cout << "AudioTrack copy assignment called for: " << other.title << std::endl;
     #endif
-    // Your code here...
+    if (this != &other) {
+        clear();
+        copy_from(other);
+    }
     return *this;
 }
 
@@ -61,7 +64,7 @@ AudioTrack::AudioTrack(AudioTrack&& other) noexcept {
     #ifdef DEBUG
     std::cout << "AudioTrack move constructor called for: " << other.title << std::endl;
     #endif
-    // Your code here...
+    move_from(std::move(other));
 }
 
 AudioTrack& AudioTrack::operator=(AudioTrack&& other) noexcept {
@@ -70,7 +73,10 @@ AudioTrack& AudioTrack::operator=(AudioTrack&& other) noexcept {
     #ifdef DEBUG
     std::cout << "AudioTrack move assignment called for: " << other.title << std::endl;
     #endif
-    // Your code here...
+    if (this != &other) {
+        clear();
+        move_from(std::move(other));
+    }
     return *this;
 }
 
@@ -78,4 +84,31 @@ void AudioTrack::get_waveform_copy(double* buffer, size_t buffer_size) const {
     if (buffer && waveform_data && buffer_size <= waveform_size) {
         std::memcpy(buffer, waveform_data, buffer_size * sizeof(double));
     }
+}
+
+void AudioTrack::clear() {
+    delete[] waveform_data;
+    waveform_data = nullptr;
+    waveform_size = 0;
+}
+
+void AudioTrack::copy_from(const AudioTrack& other) {
+    title = other.title;
+    artists = other.artists;
+    duration_seconds = other.duration_seconds;
+    bpm = other.bpm;
+    waveform_size = other.waveform_size;
+    waveform_data = new double[waveform_size];
+    std::memcpy(waveform_data, other.waveform_data, waveform_size * sizeof(double)); // check this kuku
+}
+
+void AudioTrack::move_from(AudioTrack&& other) {
+    title = std::move(other.title);
+    artists = std::move(other.artists);
+    duration_seconds = other.duration_seconds;
+    bpm = other.bpm;
+    waveform_size = other.waveform_size;
+    waveform_data = other.waveform_data;
+    other.waveform_data = nullptr;
+    other.waveform_size = 0;
 }
