@@ -69,7 +69,6 @@ AudioTrack::AudioTrack(AudioTrack&& other) noexcept {
 
 AudioTrack& AudioTrack::operator=(AudioTrack&& other) noexcept {
     // TODO: Implement the move assignment operator
-
     #ifdef DEBUG
     std::cout << "AudioTrack move assignment called for: " << other.title << std::endl;
     #endif
@@ -99,7 +98,8 @@ void AudioTrack::copy_from(const AudioTrack& other) {
     bpm = other.bpm;
     waveform_size = other.waveform_size;
     waveform_data = new double[waveform_size];
-    std::memcpy(waveform_data, other.waveform_data, waveform_size * sizeof(double)); // check this kuku
+    for (size_t i = 0; i < waveform_size; i++)
+        waveform_data[i] = other.waveform_data[i];
 }
 
 void AudioTrack::move_from(AudioTrack&& other) {
