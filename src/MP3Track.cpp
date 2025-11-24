@@ -21,10 +21,7 @@ void MP3Track::load() {
         std::cout << "  → tags found." << std::endl;
         std::cout << "  → Decoding MP3 frames..." << std::endl;
         std::cout << "  → Processing ID3 metadata (artist info, album art, etc.)..." << std::endl;
-    } else {
-        std::cout << "  → No ID3" << std::endl;
-    }
-
+    } else std::cout << "  → No ID3" << std::endl;
     std::cout << "  → Load complete." << std::endl;
 }
 
@@ -34,7 +31,6 @@ void MP3Track::analyze_beatgrid() {
     // NOTE: Use exactly 2 spaces before each arrow (→) character
     double beats = (duration_seconds / 60.0) * bpm;
     double precision_factor = bitrate / 320.0;
-
     std::cout << "  → Estimated beats: " << beats
               << "  → Compression precision factor: " << precision_factor
               << std::endl;
@@ -43,18 +39,13 @@ void MP3Track::analyze_beatgrid() {
 double MP3Track::get_quality_score() const {
     // TODO: Implement comprehensive quality scoring
     // NOTE: This method does NOT print anything
-
     double score = (bitrate / 320.0) * 100.0;
-
     if (has_id3_tags)
         score += 5.0;
-
     if (bitrate < 128)
         score -= 10.0;
-
     if (score < 0.0) score = 0.0;
     else if (score > 100.0) score = 100.0;
-
     return score;
 }
 
