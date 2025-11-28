@@ -30,6 +30,17 @@ private:
     int track_count;
 
 public:
+    // Copy Constructor (Deep Copy of nodes, shallow copy of track pointers)
+    Playlist(const Playlist& other);
+    
+    // Copy Assignment Operator
+    Playlist& operator=(const Playlist& other);
+
+    // Move Constructor
+    Playlist(Playlist&& other) noexcept;
+    
+    // Move Assignment Operator
+    Playlist& operator=(Playlist&& other) noexcept;
     /**
      * Constructor
      */

@@ -18,7 +18,37 @@ AudioTrack* LRUCache::get(const std::string& track_id) {
  * TODO: Implement the put() method for LRUCache
  */
 bool LRUCache::put(PointerWrapper<AudioTrack> track) {
-    return false; // Placeholder
+    if (!track) return false;
+
+    // Case 1: HIT - Track already exists
+    // We access it to update the timestamp (MRU)
+    size_t existing_idx = findSlot(track->get_title());
+    if (existing_idx != max_size) {
+        slots[existing_idx].access(++access_counter);
+        return false; // No eviction occurred
+    }
+
+    // Case 2: MISS - Need to insert
+    bool evicted = false;
+    size_t insert_idx = findEmptySlot();
+
+    // If cache is full, we must evict first
+    if (insert_idx == max_size) {
+        if (!evictLRU()) {
+            // Should not happen if size > 0, but safety check
+            return false; 
+        }
+        insert_idx = findEmptySlot();
+        evicted = true;
+    }
+
+    // Perform the insertion
+    // Note: track is a PointerWrapper, so we move it to transfer ownership
+    if (insert_idx != max_size) {
+        slots[insert_idx].store(std::move(track), ++access_counter);
+    }
+
+    return evicted;
 }
 
 bool LRUCache::evictLRU() {
@@ -64,7 +94,19 @@ size_t LRUCache::findSlot(const std::string& track_id) const {
  * TODO: Implement the findLRUSlot() method for LRUCache
  */
 size_t LRUCache::findLRUSlot() const {
-    return 0; // Placeholder
+    size_t lru_index = max_size;
+    size_t min_time = -1; // Max possible size_t value (effectively infinity)
+
+    for (size_t i = 0; i < max_size; ++i) {
+        if (slots[i].isOccupied()) {
+            size_t time = slots[i].getLastAccessTime();
+            if (time < min_time) {
+                min_time = time;
+                lru_index = i;
+            }
+        }
+    }
+    return lru_index;
 }
 
 size_t LRUCache::findEmptySlot() const {
