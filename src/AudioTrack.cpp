@@ -8,28 +8,20 @@ AudioTrack::AudioTrack(const std::string& title, const std::vector<std::string>&
     : title(title), artists(artists), duration_seconds(duration), bpm(bpm),
       waveform_data(new double[waveform_samples]), 
       waveform_size(waveform_samples) {
-
-    // Generate some dummy waveform data for testing
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_real_distribution<double> dis(-1.0, 1.0);
-
-    for (size_t i = 0; i < waveform_size; ++i) {
+    for (size_t i = 0; i < waveform_size; ++i)
         waveform_data[i] = dis(gen);
-    }
     #ifdef DEBUG
     std::cout << "AudioTrack created: " << title << " by " << std::endl;
-    for (const auto& artist : artists) {
+    for (const auto& artist : artists)
         std::cout << artist << " ";
-    }
     std::cout << std::endl;
     #endif
 }
 
-// ========== TODO: STUDENTS IMPLEMENT RULE OF 5 ==========
-
 AudioTrack::~AudioTrack() {
-    // TODO: Implement the destructor
     #ifdef DEBUG
     std::cout << "AudioTrack destructor called for: " << title << std::endl;
     #endif
@@ -51,7 +43,6 @@ AudioTrack::AudioTrack(const AudioTrack& other)
 }
 
 AudioTrack& AudioTrack::operator=(const AudioTrack& other) {
-    // TODO: Implement the copy assignment operator
     #ifdef DEBUG
     std::cout << "AudioTrack copy assignment called for: " << other.title << std::endl;
     #endif
@@ -77,7 +68,6 @@ AudioTrack::AudioTrack(AudioTrack&& other) noexcept
 }
 
 AudioTrack& AudioTrack::operator=(AudioTrack&& other) noexcept {
-    // TODO: Implement the move assignment operator
     #ifdef DEBUG
     std::cout << "AudioTrack move assignment called for: " << other.title << std::endl;
     #endif
@@ -89,9 +79,8 @@ AudioTrack& AudioTrack::operator=(AudioTrack&& other) noexcept {
 }
 
 void AudioTrack::get_waveform_copy(double* buffer, size_t buffer_size) const {
-    if (buffer && waveform_data && buffer_size <= waveform_size) {
+    if (buffer && waveform_data && buffer_size <= waveform_size)
         std::memcpy(buffer, waveform_data, buffer_size * sizeof(double));
-    }
 }
 
 void AudioTrack::clear() {
