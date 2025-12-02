@@ -9,9 +9,6 @@
 DJLibraryService::DJLibraryService(const Playlist& playlist) 
     : playlist(playlist), library() {}
 
-DJLibraryService::DJLibraryService() 
-    : playlist(""), library() {}
-
 DJLibraryService::~DJLibraryService() {
     for (AudioTrack* track : library)
         delete track;

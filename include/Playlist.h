@@ -29,6 +29,10 @@ private:
     std::string playlist_name;
     int track_count;
 
+    void clear_nodes();
+    void copy_nodes_from(const Playlist& other);
+    void move_nodes_from(Playlist&& other);
+
 public:
     // Copy Constructor (Deep Copy of nodes, shallow copy of track pointers)
     Playlist(const Playlist& other);

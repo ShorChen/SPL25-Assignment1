@@ -11,7 +11,6 @@
 struct SessionConfig {
     std::string app_name;
     std::string version;
-    std::string playlists_directory;
     
     // Library tracks from config file
     struct TrackInfo {
@@ -48,7 +47,6 @@ struct SessionConfig {
     SessionConfig() 
         : app_name(""), 
           version(""), 
-          playlists_directory(""),
           library_tracks(), 
           controller_cache_size(8), 
           default_crossfade_time(5), 

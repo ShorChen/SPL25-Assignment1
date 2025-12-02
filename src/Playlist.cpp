@@ -9,42 +9,15 @@ Playlist::Playlist(const std::string& name)
 }
 
 Playlist::Playlist(const Playlist& other) 
-    : head(nullptr), playlist_name(other.playlist_name), track_count(0) {    
-    PlaylistNode* current = other.head;
-    PlaylistNode* last_added = nullptr;
-    while (current) {
-        PlaylistNode* new_node = new PlaylistNode(current->track);
-        if (!head)
-            head = new_node;
-        else last_added->next = new_node;
-        last_added = new_node;
-        current = current->next;
-        track_count++;
-    }
+    : head(nullptr), playlist_name(other.playlist_name), track_count(0) {
+        copy_nodes_from(other);
 }
 
 Playlist& Playlist::operator=(const Playlist& other) {
     if (this != &other) {
-        PlaylistNode* current = head;
-        while (current) {
-            PlaylistNode* next = current->next;
-            delete current;
-            current = next;
-        }
-        head = nullptr;
-        track_count = 0;
+        clear_nodes();
         playlist_name = other.playlist_name;
-        current = other.head;
-        PlaylistNode* last_added = nullptr;
-        while (current) {
-            PlaylistNode* new_node = new PlaylistNode(current->track);
-            if (!head)
-                head = new_node;
-            else last_added->next = new_node;
-            last_added = new_node;
-            current = current->next;
-            track_count++;
-        }
+        copy_nodes_from(other);
     }
     return *this;
 }
@@ -53,36 +26,22 @@ Playlist::~Playlist() {
     #ifdef DEBUG
     std::cout << "Destroying playlist: " << playlist_name << std::endl;
     #endif
-    PlaylistNode* next;
-    while (head) {
-        next = head->next;
-        delete head;
-        head = next;
-    }
+    clear_nodes();
 }
 
 Playlist::Playlist(Playlist&& other) noexcept 
-    : head(other.head), 
-      playlist_name(std::move(other.playlist_name)), 
-      track_count(other.track_count) 
+    : head(other.head),
+      playlist_name(std::move(other.playlist_name)),
+      track_count(other.track_count)
 {
-    other.head = nullptr;
-    other.track_count = 0;
+    move_nodes_from(std::move(other));
 }
 
 Playlist& Playlist::operator=(Playlist&& other) noexcept {
     if (this != &other) {
-        PlaylistNode* current = head;
-        while (current) {
-            PlaylistNode* next = current->next;
-            delete current;
-            current = next;
-        }
-        head = other.head;
+        clear_nodes();
         playlist_name = std::move(other.playlist_name);
-        track_count = other.track_count;        
-        other.head = nullptr;
-        other.track_count = 0;
+        move_nodes_from(std::move(other));
     }
     return *this;
 }
@@ -107,7 +66,6 @@ void Playlist::remove_track(const std::string& title) {
         prev = current;
         current = current->next;
     }
-
     if (current) {
         if (prev)
             prev->next = current->next;
@@ -115,7 +73,6 @@ void Playlist::remove_track(const std::string& title) {
         delete current;
         track_count--;
         std::cout << "Removed '" << title << "' from playlist" << std::endl;
-
     } else std::cout << "Track '" << title << "' not found in playlist" << std::endl;
 }
 
@@ -174,4 +131,38 @@ std::vector<AudioTrack*> Playlist::getTracks() const {
         current = current->next;
     }
     return tracks;
+}
+
+void Playlist::clear_nodes() {
+    PlaylistNode* current = head;
+    PlaylistNode* next;
+    while (current) {
+        next = current->next;
+        delete current;
+        current = next;
+    }
+    head = nullptr;
+    track_count = 0;
+}
+
+void Playlist::copy_nodes_from(const Playlist& other) {
+    PlaylistNode* current = other.head;
+    PlaylistNode* last_added = nullptr;
+    PlaylistNode* new_node;
+    while (current) {
+        new_node = new PlaylistNode(current->track);
+        if (!head) 
+            head = new_node;
+        else last_added->next = new_node;
+        last_added = new_node;
+        current = current->next;
+        track_count++;
+    }
+}
+
+void Playlist::move_nodes_from(Playlist&& other) {
+    head = other.head;
+    track_count = other.track_count;   
+    other.head = nullptr;
+    other.track_count = 0;
 }

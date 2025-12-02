@@ -189,7 +189,7 @@ std::string DJSession::display_playlist_menu_from_config() {
             return "";
         }
         std::stringstream ss(input);
-        if (ss >> selection && ss.eof())
+        if (ss >> selection && ss.eof()) {
             if (selection == 0)
                 return "";
             else if (selection >= 1 && selection <= static_cast<int>(playlist_names.size())) {
@@ -197,6 +197,7 @@ std::string DJSession::display_playlist_menu_from_config() {
                 std::cout << "Selected: " << selected_name << std::endl;
                 return selected_name;
             }
+        }
         std::cout << "Invalid selection. Please enter a number between 1 and " 
                   << playlist_names.size() << ", or 0 to cancel." << std::endl;
     }
