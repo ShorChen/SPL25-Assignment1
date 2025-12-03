@@ -63,6 +63,7 @@ public:
      * What should happen to the source wrapper after the move?
      */
     PointerWrapper(PointerWrapper&& other) noexcept : ptr(other.ptr) {
+        std::cout << "Move constructor called for: " << ptr << "\n";
         other.ptr = nullptr;
     }
 
@@ -134,6 +135,7 @@ public:
      * What should happen to the old pointer?
      */
     void reset(T* new_ptr = nullptr) {
+        std::cout << "Reset called for pointer: " << ptr << "\n";
         if (ptr != new_ptr) {
             delete ptr;
             ptr = new_ptr;

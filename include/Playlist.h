@@ -16,7 +16,7 @@
  */
 
 struct PlaylistNode {
-    AudioTrack* track; 
+    AudioTrack* track;
     PlaylistNode* next;
 
     PlaylistNode(AudioTrack* t) : track(t), next(nullptr) {}
