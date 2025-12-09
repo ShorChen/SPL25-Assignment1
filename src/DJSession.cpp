@@ -114,7 +114,6 @@ void DJSession::simulate_dj_performance() {
     std::cout << "Auto Sync: " << (session_config.auto_sync ? "enabled" : "disabled") << std::endl;
     std::cout << "Cache Capacity: " << session_config.controller_cache_size << " slots (LRU policy)" << std::endl;
     std::cout << "\n--- Processing Tracks ---" << std::endl;
-    std::cout << "TODO: Implement the DJ performance simulation workflow here." << std::endl;
     bool running = true;
     while (running) {
         std::vector<std::string> playlists_to_process;

@@ -20,9 +20,8 @@ DJLibraryService::~DJLibraryService() {
  * @param library_tracks Vector of track info from config
  */
 void DJLibraryService::buildLibrary(const std::vector<SessionConfig::TrackInfo>& library_tracks) {
-    DJLibraryService::~DJLibraryService();
+    AudioTrack* new_track = nullptr;
     for (const auto& info : library_tracks) {
-        AudioTrack* new_track = nullptr;
         if (info.type == "MP3") {
             new_track = new MP3Track(info.title, info.artists, info.duration_seconds, 
                                      info.bpm, info.extra_param1, static_cast<bool>(info.extra_param2));
@@ -35,8 +34,9 @@ void DJLibraryService::buildLibrary(const std::vector<SessionConfig::TrackInfo>&
         }
         if (new_track)
             library.push_back(new_track);
+        new_track = nullptr;
     }
-    std::cout << "[INFO] Track library built: " << library.size() << " tracks loaded" << std::endl;
+    std::cout << "[INFO] Track library built: " << library_tracks.size() << " tracks loaded" << std::endl;
 }
 
 /**
