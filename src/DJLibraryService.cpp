@@ -26,7 +26,6 @@ void DJLibraryService::buildLibrary(const std::vector<SessionConfig::TrackInfo>&
             new_track = new MP3Track(info.title, info.artists, info.duration_seconds, 
                                      info.bpm, info.extra_param1, static_cast<bool>(info.extra_param2));
             std::cout << "[INFO] MP3Track created: " << info.extra_param1 << " kbps" << std::endl;
-
         } else if (info.type == "WAV") {
             new_track = new WAVTrack(info.title, info.artists, info.duration_seconds, 
                                      info.bpm, info.extra_param1, info.extra_param2);

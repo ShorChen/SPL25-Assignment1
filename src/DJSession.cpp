@@ -62,6 +62,7 @@ int DJSession::load_track_to_controller(const std::string& track_name) {
             stats.cache_hits++;
             break;
     }
+    controller_service.displayCacheStatus();
     return result;
 }
 
@@ -77,19 +78,25 @@ bool DJSession::load_track_to_mixer_deck(const std::string& track_title) {
         return false;
     }
     int deck_index = mixing_service.loadTrackToDeck(*cached_track);
+    bool flag;
     switch (deck_index) {
         case 0:
             stats.deck_loads_a++;
             stats.transitions++;
-            return true;
+            flag = true;
+            break;
         case 1:
             stats.deck_loads_b++;
             stats.transitions++;
-            return true;
-        default:
+            flag = true;
+            break;
+        case -1:
             stats.errors++;
-            return false;
+            flag = false;
+            break;
     }
+    mixing_service.displayDeckStatus();
+    return flag;
 }
 
 /**
@@ -114,35 +121,25 @@ void DJSession::simulate_dj_performance() {
     std::cout << "Auto Sync: " << (session_config.auto_sync ? "enabled" : "disabled") << std::endl;
     std::cout << "Cache Capacity: " << session_config.controller_cache_size << " slots (LRU policy)" << std::endl;
     std::cout << "\n--- Processing Tracks ---" << std::endl;
-    bool running = true;
-    while (running) {
+    if (play_all) {
         std::vector<std::string> playlists_to_process;
-        if (play_all) {
-            for (const auto& pair : session_config.playlists)
-                playlists_to_process.push_back(pair.first);
-            std::sort(playlists_to_process.begin(), playlists_to_process.end());
-            running = false;
-        } else {
-            std::string selected = display_playlist_menu_from_config();
-            if (selected.empty()) {
-                running = false;
-                break;
-            }
-            playlists_to_process.push_back(selected);
+        for (const auto& pair : session_config.playlists)
+            playlists_to_process.push_back(pair.first);
+        std::sort(playlists_to_process.begin(), playlists_to_process.end());
+    for (const auto& playlist_name : playlists_to_process) {            
+        if (!load_playlist(playlist_name))
+            continue;
+        std::reverse(track_titles.begin(), track_titles.end());
+        for (const auto& title : track_titles) {
+            std::cout << "\n-- Processing: " << title << " --" << std::endl;
+            stats.tracks_processed++;
+            load_track_to_controller(title);
+            load_track_to_mixer_deck(title);
         }
-        for (const auto& playlist_name : playlists_to_process) {            
-            if (!load_playlist(playlist_name))
-                continue;
-            for (const auto& title : track_titles) {
-                std::cout << "\n-- Processing: " << title << " --" << std::endl;
-                stats.tracks_processed++;
-                load_track_to_controller(title);
-                load_track_to_mixer_deck(title);
-            }
-            print_session_summary();
-            stats = SessionStats(); 
-        }
+        print_session_summary();
     }
+    }
+    else display_playlist_menu_from_config();
     std::cout << "Session cancelled by user or all playlists played." << std::endl;
 }
 
