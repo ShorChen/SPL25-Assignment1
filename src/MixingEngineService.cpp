@@ -33,7 +33,7 @@ int MixingEngineService::loadTrackToDeck(const AudioTrack& track) {
         std::cerr << "[ERROR] Track: \"" << track.get_title() << "\" failed to clone" << std::endl;
         return -1;
     }
-    size_t target_deck = (decks[active_deck] == nullptr) ? active_deck : (1 - active_deck);
+    size_t target_deck = (1 - active_deck) % 2;
     std::cout << "[Deck Switch] Target deck: " << target_deck << std::endl;
     if (decks[target_deck]) {
         delete decks[target_deck];
@@ -41,21 +41,20 @@ int MixingEngineService::loadTrackToDeck(const AudioTrack& track) {
     }
     cloned_track->load();
     cloned_track->analyze_beatgrid();
-    if (decks[active_deck] && auto_sync)
-        if (!can_mix_tracks(cloned_track))
-            sync_bpm(cloned_track);
-    decks[target_deck] = cloned_track.release();
-    std::cout << "[Load Complete] '" << decks[target_deck]->get_title() 
-              << "' is now loaded on deck " << target_deck << std::endl;
-    if (target_deck != active_deck && decks[active_deck]) {
+    if (!can_mix_tracks(cloned_track) && auto_sync)
+        sync_bpm(cloned_track);
+    active_deck = target_deck;
+    if (decks[active_deck]) {
         std::cout << "[Unload] Unloading previous deck " << active_deck 
                   << " (" << decks[active_deck]->get_title() << ")" << std::endl;
         delete decks[active_deck];
         decks[active_deck] = nullptr;
     }
-    active_deck = target_deck;
+    decks[target_deck] = cloned_track.release();
+    std::cout << "[Load Complete] '" << decks[target_deck]->get_title() 
+              << "' is now loaded on deck " << target_deck << std::endl;
     std::cout << "[Active Deck] Switched to deck " << target_deck << std::endl;
-    return static_cast<int>(target_deck);
+    return active_deck;
 }
 
 /**
